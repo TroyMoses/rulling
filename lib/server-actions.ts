@@ -149,6 +149,33 @@ export async function updateBanner(id: string, formData: FormData) {
   }
 }
 
+export async function deleteBanner(id: string) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/banners/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to delete banner",
+      };
+    }
+
+    return { success: true, message: "Banner deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting banner:", error);
+    return { success: false, message: "Failed to delete banner" };
+  }
+}
+
 // Contact Form Action - Now using Next.js API route
 export async function submitContactForm(formData: FormData) {
   try {

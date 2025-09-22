@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Plus, Edit, Trash2, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,75 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ProductForm } from "@/components/product-form";
-import { products } from "@/lib/dummy-data";
+import { deleteProduct } from "@/lib/server-actions";
+import { toast } from "sonner";
+
+interface Product {
+  _id: string;
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  category: string;
+  brand: string;
+  stock: number;
+  featured: boolean;
+  images: string[];
+  rating: number;
+  reviewCount: number;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export function ProductsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("/api/products");
+      const data = await response.json();
+      if (response.ok) {
+        // Transform MongoDB _id to id for compatibility
+        const transformedProducts = data.products.map((product: Product) => ({
+          ...product,
+          id: product._id,
+        }));
+        setProducts(transformedProducts);
+      } else {
+        toast.error("Failed to fetch products");
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to fetch products");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleDeleteProduct = async (productId: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      const result = await deleteProduct(productId);
+      if (result.success) {
+        toast.success(result.message);
+        fetchProducts(); // Refresh the list
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error("Failed to delete product");
+    }
+  };
 
   const filteredProducts = products.filter(
     (product) =>
@@ -36,6 +100,14 @@ export function ProductsManagement() {
       product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Loading products...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -58,7 +130,12 @@ export function ProductsManagement() {
                 Create a new product for your store
               </DialogDescription>
             </DialogHeader>
-            <ProductForm onSuccess={() => setIsAddingProduct(false)} />
+            <ProductForm
+              onSuccess={() => {
+                setIsAddingProduct(false);
+                fetchProducts(); // Refresh products after creation
+              }}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -183,13 +260,22 @@ export function ProductsManagement() {
                               Update product information
                             </DialogDescription>
                           </DialogHeader>
-                          <ProductForm product={product} />
+                          <ProductForm
+                            product={{
+                              ...product,
+                              tags: product.tags ?? [],
+                              createdAt: product.createdAt ?? "",
+                              updatedAt: product.updatedAt ?? "",
+                            }}
+                            onSuccess={() => fetchProducts()}
+                          />
                         </DialogContent>
                       </Dialog>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="text-destructive cursor-pointer"
+                        onClick={() => handleDeleteProduct(product.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

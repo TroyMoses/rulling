@@ -13,6 +13,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  isAdmin?: boolean; // Added isAdmin field to User interface
 }
 
 interface AuthContextType {
