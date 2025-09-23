@@ -50,11 +50,16 @@ export function LoginForm() {
       } else if (result.success && result.user) {
         setUser(result.user);
 
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         if (result.user.isAdmin && redirectTo.startsWith("/admin")) {
+          console.log("[v0] Redirecting admin to:", redirectTo);
           router.push(redirectTo);
         } else if (result.user.isAdmin && redirectTo === "/") {
+          console.log("[v0] Redirecting admin to admin dashboard");
           router.push("/admin");
         } else {
+          console.log("[v0] Redirecting user to:", redirectTo);
           router.push(redirectTo);
         }
         router.refresh();

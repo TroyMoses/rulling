@@ -38,8 +38,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate token
-    const token = generateToken(user._id.toString());
+    const token = await generateToken(
+      user._id.toString(),
+      user.isAdmin || false
+    );
 
     // Create response with user data (without password)
     const userData = {
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 24 * 60 * 60, // 24 hours
+      path: "/",
     });
 
     return response;

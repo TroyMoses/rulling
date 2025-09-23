@@ -20,7 +20,7 @@ export async function getAdminUser(
       return null;
     }
 
-    const payload = verifyToken(token);
+    const payload = await verifyToken(token);
     if (!payload) {
       return null;
     }

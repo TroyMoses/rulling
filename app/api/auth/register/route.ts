@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate token
-    const token = generateToken(result.insertedId.toString());
+    const token = await generateToken(result.insertedId.toString(), false);
 
     // Create response with user data (without password)
     const user = {
