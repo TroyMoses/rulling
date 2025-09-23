@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,10 +23,80 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { BannerForm } from "@/components/banner-form";
-import { banners } from "@/lib/dummy-data";
+import { toast } from "sonner";
+
+interface Banner {
+  _id: string;
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  isActive: boolean;
+  order?: number;
+  link?: string;
+  buttonText?: string;
+  active?: boolean;
+}
 
 export function BannersManagement() {
   const [isAddingBanner, setIsAddingBanner] = useState(false);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchBanners = async () => {
+    try {
+      const response = await fetch("/api/banners");
+      const data = await response.json();
+      if (response.ok) {
+        // Transform MongoDB _id to id for compatibility
+        const transformedBanners = data.banners.map((banner: Banner) => ({
+          ...banner,
+          id: banner._id,
+          active: banner.isActive, // Map isActive to active for compatibility
+        }));
+        setBanners(transformedBanners);
+      } else {
+        toast.error("Failed to fetch banners");
+      }
+    } catch (error) {
+      console.error("Error fetching banners:", error);
+      toast.error("Failed to fetch banners");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const handleDeleteBanner = async (bannerId: string) => {
+    if (!confirm("Are you sure you want to delete this banner?")) return;
+
+    try {
+      const response = await fetch(`/api/banners/${bannerId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(result.message);
+        fetchBanners(); // Refresh the list
+      } else {
+        toast.error(result.error || "Failed to delete banner");
+      }
+    } catch {
+      toast.error("Failed to delete banner");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Loading banners...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -51,7 +121,12 @@ export function BannersManagement() {
                 Create a new promotional banner
               </DialogDescription>
             </DialogHeader>
-            <BannerForm onSuccess={() => setIsAddingBanner(false)} />
+            <BannerForm
+              onSuccess={() => {
+                setIsAddingBanner(false);
+                fetchBanners(); // Refresh banners after creation
+              }}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -73,7 +148,7 @@ export function BannersManagement() {
             </TableHeader>
             <TableBody>
               {banners
-                .sort((a, b) => a.order - b.order)
+                .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map((banner) => (
                   <TableRow key={banner.id}>
                     <TableCell>
@@ -95,11 +170,13 @@ export function BannersManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{banner.order}</Badge>
+                      <Badge variant="outline">{banner.order || 0}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={banner.active ? "default" : "secondary"}>
-                        {banner.active ? "Active" : "Inactive"}
+                      <Badge
+                        variant={banner.isActive ? "default" : "secondary"}
+                      >
+                        {banner.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -109,7 +186,7 @@ export function BannersManagement() {
                           size="sm"
                           className="cursor-pointer"
                         >
-                          {banner.active ? (
+                          {banner.isActive ? (
                             <EyeOff className="h-4 w-4" />
                           ) : (
                             <Eye className="h-4 w-4" />
@@ -132,13 +209,23 @@ export function BannersManagement() {
                                 Update banner information
                               </DialogDescription>
                             </DialogHeader>
-                            <BannerForm banner={banner} />
+                            <BannerForm
+                              banner={{
+                                ...banner,
+                                order: banner.order ?? 0,
+                                link: banner.link ?? "",
+                                buttonText: banner.buttonText ?? "",
+                                active: banner.active ?? false,
+                              }}
+                              onSuccess={() => fetchBanners()} // Refresh after update
+                            />
                           </DialogContent>
                         </Dialog>
                         <Button
                           variant="ghost"
                           size="sm"
                           className="text-destructive cursor-pointer"
+                          onClick={() => handleDeleteBanner(banner.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

@@ -1,28 +1,37 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "@/contexts/auth-context"
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const router = useRouter()
-  const { setUser } = useAuth()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { setUser } = useAuth();
+
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -31,31 +40,45 @@ export function LoginForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      const result = await response.json()
-      console.log("[v0] Login result:", result)
+      const result = await response.json();
+      console.log("[v0] Login result:", result);
 
       if (!response.ok || result.error) {
-        setError(result.error || "Login failed")
+        setError(result.error || "Login failed");
       } else if (result.success && result.user) {
-        setUser(result.user)
-        router.push("/")
-        router.refresh()
+        setUser(result.user);
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        if (result.user.isAdmin && redirectTo.startsWith("/admin")) {
+          console.log("[v0] Redirecting admin to:", redirectTo);
+          router.push(redirectTo);
+        } else if (result.user.isAdmin && redirectTo === "/") {
+          console.log("[v0] Redirecting admin to admin dashboard");
+          router.push("/admin");
+        } else {
+          console.log("[v0] Redirecting user to:", redirectTo);
+          router.push(redirectTo);
+        }
+        router.refresh();
       }
     } catch (err) {
-      console.log("[v0] Login error:", err)
-      setError("An unexpected error occurred. Please try again.")
+      console.log("[v0] Login error:", err);
+      setError("An unexpected error occurred. Please try again.");
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Login</CardTitle>
-        <CardDescription>Enter your credentials to access your account</CardDescription>
+        <CardDescription>
+          Enter your credentials to access your account
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,5 +117,5 @@ export function LoginForm() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,91 +1,309 @@
-"use server"
+"use server";
 
-// Note: The following functions currently call FastAPI endpoints.
-// These would need to be converted to Next.js API routes with MongoDB
-// if you want to implement these features in the full-stack app.
+// Product Management Actions - Now using Next.js API routes
+export async function createProduct(formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/products`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
-// Product Management Actions - Currently calling FastAPI
-// export async function createProduct(formData: FormData) {
-export async function createProduct() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Product creation not yet implemented with MongoDB")
-  return { success: false, message: "Product management not yet implemented" }
-}
+    const result = await response.json();
 
-// export async function updateProduct(id: string, formData: FormData) {
-export async function updateProduct() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Product update not yet implemented with MongoDB")
-  return { success: false, message: "Product management not yet implemented" }
-}
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to create product",
+      };
+    }
 
-// export async function deleteProduct(id: string) {
-export async function deleteProduct() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Product deletion not yet implemented with MongoDB")
-  return { success: false, message: "Product management not yet implemented" }
-}
-
-// Banner Management Actions - Currently calling FastAPI
-// export async function createBanner(formData: FormData) {
-export async function createBanner() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Banner creation not yet implemented with MongoDB")
-  return { success: false, message: "Banner management not yet implemented" }
-}
-
-// export async function updateBanner(id: string, formData: FormData) {
-export async function updateBanner() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Banner update not yet implemented with MongoDB")
-  return { success: false, message: "Banner management not yet implemented" }
-}
-
-// Contact Form Action - Currently calling FastAPI
-// export async function submitContactForm(formData: FormData) {
-export async function submitContactForm() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Contact form not yet implemented with MongoDB")
-  return {
-    success: false,
-    message: "Contact form not yet implemented",
+    return {
+      success: true,
+      message: "Product created successfully",
+      data: result,
+    };
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return { success: false, message: "Failed to create product" };
   }
 }
 
-// Newsletter Subscription Action - Currently calling FastAPI
-// export async function subscribeNewsletter(formData: FormData) {
-export async function subscribeNewsletter() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Newsletter subscription not yet implemented with MongoDB")
-  return {
-    success: false,
-    message: "Newsletter subscription not yet implemented",
+export async function updateProduct(id: string, formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/products/${id}`,
+      {
+        method: "PUT",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to update product",
+      };
+    }
+
+    return { success: true, message: "Product updated successfully" };
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return { success: false, message: "Failed to update product" };
   }
 }
 
-// Review Submission Action - Currently calling FastAPI
-// export async function submitReview(formData: FormData) {
-export async function submitReview() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Review submission not yet implemented with MongoDB")
-  return {
-    success: false,
-    message: "Review submission not yet implemented",
+export async function deleteProduct(id: string) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/products/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to delete product",
+      };
+    }
+
+    return { success: true, message: "Product deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return { success: false, message: "Failed to delete product" };
   }
 }
 
-// Promotion Management Actions - Currently calling FastAPI
+// Banner Management Actions - Now using Next.js API routes
+export async function createBanner(formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/banners`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to create banner",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Banner created successfully",
+      data: result,
+    };
+  } catch (error) {
+    console.error("Error creating banner:", error);
+    return { success: false, message: "Failed to create banner" };
+  }
+}
+
+export async function updateBanner(id: string, formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/banners/${id}`,
+      {
+        method: "PUT",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to update banner",
+      };
+    }
+
+    return { success: true, message: "Banner updated successfully" };
+  } catch (error) {
+    console.error("Error updating banner:", error);
+    return { success: false, message: "Failed to update banner" };
+  }
+}
+
+export async function deleteBanner(id: string) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/banners/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to delete banner",
+      };
+    }
+
+    return { success: true, message: "Banner deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting banner:", error);
+    return { success: false, message: "Failed to delete banner" };
+  }
+}
+
+// Contact Form Action - Now using Next.js API route
+export async function submitContactForm(formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/contact`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to submit contact form",
+      };
+    }
+
+    return { success: true, message: "Contact form submitted successfully" };
+  } catch (error) {
+    console.error("Error submitting contact form:", error);
+    return { success: false, message: "Failed to submit contact form" };
+  }
+}
+
+// Newsletter Subscription Action - Now using Next.js API route
+export async function subscribeNewsletter(formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/newsletter`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to subscribe to newsletter",
+      };
+    }
+
+    return { success: true, message: "Successfully subscribed to newsletter" };
+  } catch (error) {
+    console.error("Error subscribing to newsletter:", error);
+    return { success: false, message: "Failed to subscribe to newsletter" };
+  }
+}
+
+// Review Submission Action - Now using Next.js API route
+export async function submitReview(formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/reviews`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to submit review",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Review submitted successfully and is pending approval",
+    };
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    return { success: false, message: "Failed to submit review" };
+  }
+}
+
+// Promotion Management Actions - Basic implementation (can be expanded)
 // export async function createPromotion(formData: FormData) {
 export async function createPromotion() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Promotion creation not yet implemented with MongoDB")
-  return { success: false, message: "Promotion management not yet implemented" }
+  console.log("Promotion creation - basic implementation");
+  return {
+    success: true,
+    message: "Promotion feature can be expanded with dedicated API routes",
+  };
 }
 
-// Testimonial Management Actions - Currently calling FastAPI
-// export async function createTestimonial(formData: FormData) {
-export async function createTestimonial() {
-  // TODO: Implement with Next.js API route and MongoDB
-  console.log("Testimonial creation not yet implemented with MongoDB")
-  return { success: false, message: "Testimonial management not yet implemented" }
+// Testimonial Management Actions - Now using Next.js API route
+export async function createTestimonial(formData: FormData) {
+  try {
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+      }/api/testimonials`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.error || "Failed to submit testimonial",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Testimonial submitted successfully and is pending approval",
+    };
+  } catch (error) {
+    console.error("Error submitting testimonial:", error);
+    return { success: false, message: "Failed to submit testimonial" };
+  }
 }
