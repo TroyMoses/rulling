@@ -9,13 +9,14 @@ import { ObjectId } from "mongodb";
 // GET /api/products/[id] - Get single product
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { db } = await connectToDatabase();
     const product = await db
       .collection("products")
-      .findOne({ _id: new ObjectId(params.id) });
+      .findOne({ _id: new ObjectId(id) });
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -34,9 +35,10 @@ export async function GET(
 // PUT /api/products/[id] - Update product
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { db } = await connectToDatabase();
     const formData = await request.formData();
 
@@ -130,7 +132,7 @@ export async function PUT(
       // Get existing images
       const existingProduct = await db
         .collection("products")
-        .findOne({ _id: new ObjectId(params.id) });
+        .findOne({ _id: new ObjectId(id) });
       updateData.images = [
         ...(existingProduct?.images || []),
         ...newImagePaths,
@@ -139,7 +141,7 @@ export async function PUT(
 
     const result = await db
       .collection("products")
-      .updateOne({ _id: new ObjectId(params.id) }, { $set: updateData });
+      .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -161,14 +163,15 @@ export async function PUT(
 // DELETE /api/products/[id] - Delete product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { db } = await connectToDatabase();
 
     const result = await db
       .collection("products")
-      .deleteOne({ _id: new ObjectId(params.id) });
+      .deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
