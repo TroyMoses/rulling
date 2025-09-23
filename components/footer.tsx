@@ -5,7 +5,6 @@ import {
   Instagram,
   Youtube,
   Mail,
-  Phone,
   MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -147,13 +146,12 @@ export function Footer() {
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">
-                  123 Commerce Street, Business District, NY 10001
+                  Find us on Kampala Rd, next to Food Hub Parliament Ave
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">
-                  +1 (555) 123-4567
+                  📞 0754805746 | WhatsApp 0782570143
                 </span>
               </div>
               <div className="flex items-center space-x-3">

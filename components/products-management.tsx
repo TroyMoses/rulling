@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Plus, Edit, Trash2, Search, Filter } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { ProductForm } from "@/components/product-form";
 import { deleteProduct } from "@/lib/server-actions";
 import { toast } from "sonner";
@@ -51,6 +62,9 @@ export function ProductsManagement() {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(
+    null
+  );
 
   const fetchProducts = async () => {
     try {
@@ -79,8 +93,7 @@ export function ProductsManagement() {
   }, []);
 
   const handleDeleteProduct = async (productId: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-
+    setDeletingProductId(productId);
     try {
       const result = await deleteProduct(productId);
       if (result.success) {
@@ -91,19 +104,25 @@ export function ProductsManagement() {
       }
     } catch {
       toast.error("Failed to delete product");
+    } finally {
+      setDeletingProductId(null);
     }
   };
 
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading products...</div>
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <div className="text-lg">Loading products...</div>
+        </div>
       </div>
     );
   }
@@ -122,7 +141,7 @@ export function ProductsManagement() {
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
               <DialogDescription>
@@ -252,7 +271,7 @@ export function ProductsManagement() {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Edit Product</DialogTitle>
                             <DialogDescription>
@@ -270,14 +289,42 @@ export function ProductsManagement() {
                           />
                         </DialogContent>
                       </Dialog>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive cursor-pointer"
-                        onClick={() => handleDeleteProduct(product.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive cursor-pointer"
+                            disabled={deletingProductId === product.id}
+                          >
+                            {deletingProductId === product.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete &quot;{product.name}&quot;?
+                              This action cannot be undone and will permanently
+                              remove the product from your store.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Product
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
