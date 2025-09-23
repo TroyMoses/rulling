@@ -5,7 +5,7 @@ export async function createProduct(formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/products`,
       {
         method: "POST",
@@ -37,7 +37,7 @@ export async function updateProduct(id: string, formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/products/${id}`,
       {
         method: "PUT",
@@ -65,7 +65,7 @@ export async function deleteProduct(id: string) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/products/${id}`,
       {
         method: "DELETE",
@@ -93,7 +93,7 @@ export async function createBanner(formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/banners`,
       {
         method: "POST",
@@ -125,7 +125,7 @@ export async function updateBanner(id: string, formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/banners/${id}`,
       {
         method: "PUT",
@@ -153,7 +153,7 @@ export async function deleteBanner(id: string) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/banners/${id}`,
       {
         method: "DELETE",
@@ -181,7 +181,7 @@ export async function submitContactForm(formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/contact`,
       {
         method: "POST",
@@ -210,7 +210,7 @@ export async function subscribeNewsletter(formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/newsletter`,
       {
         method: "POST",
@@ -239,7 +239,7 @@ export async function submitReview(formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/reviews`,
       {
         method: "POST",
@@ -281,7 +281,7 @@ export async function createTestimonial(formData: FormData) {
   try {
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "https://rulling-gadgetshub.vercel.app"
       }/api/testimonials`,
       {
         method: "POST",
